@@ -1,13 +1,18 @@
 {% extends 'tweets/base.html' %}
 {% block content %}
+<div class="row">
+    <div class="col-lg-3"></div>
+    <div class="col-lg-6">
     <div class="media border p-3 mt-4" style="border:1px solid black;">
         <img class="mr-3 mt-3 rounded-circle" style="width:60px" src="{{ object.user.profile.image.url }}">
         <div class="media-body">
             {% if object.parent %}
-            <p><span class="text-muted">Posted via <a href="/{{ object.parent.user.username }}">{{ object.parent.user}}</a>
-            at <small> {{ object.parent.date_posted }} </small></span></p>
-            {% endif %}
+            <p><span class="text-muted">Retweeted via <a href="/{{ object.user.username }}">{{ object.user}}</a>
+            at <small> {{ object.date_posted }} </small></span></p>
+            <h5><a href="/{{ object.parent.user.username }}">{{ object.parent.user.username }}</a> Posted on {{ object.parent.date_posted }}</h5>
+            {% else %}
             <h5><a href="/{{ object.user.username }}">{{ object.user.username }}</a> Posted on {{ object.date_posted }}</h5>
+            {% endif %}
                 <p class="media-content">{{ object.content }}</p>
                 <!-- <a class="retweetBtn" href="/{{ object.id }}/retweet/">Retweet</a> |  -->
                 {% if object.parent %}
@@ -25,7 +30,9 @@
                 {% endif %}
             </div>
       </div>
-          
+    </div>
+</div>
+<div class="col-lg-3"></div>     
           <!-- Modal -->
           
 {% endblock content %}

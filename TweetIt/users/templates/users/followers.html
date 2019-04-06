@@ -109,7 +109,13 @@
                         </div>
                         <div class="user-details">
                                 <p><a href="{% url 'user-detail' follow.profile.username %}"> {{ follow.profile.username }}</a></p>
-                                <small>{{ follow.profile.profile.description }}</small>
+                                <p><small>{{ follow.profile.profile.description }}</small></p>
+                                {% if request.user == follow.profile %}
+                                {% elif follow.profile in request.user.user_profile.following.all %}
+                                <a href="{% url 'user-follow' follow.profile %}">Unfollow</a>
+                                {% else %}
+                                <a href="{% url 'user-follow' follow.profile %}">Follow</a>
+                                {% endif %}
                         </div>
                     </div>
                 </div>

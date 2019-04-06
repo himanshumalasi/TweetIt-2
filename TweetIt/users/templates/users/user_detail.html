@@ -78,10 +78,27 @@
         <div class="col-lg-6 col-sm-5 mt-2">
                 {% for tweet in object.tweet_set.all %}
                 <div class='media border p-3'>
-                    <img src="{{ object.profile.image.url }}" alt='{{ object.username }}' class="mr-3 mt-3 rounded-circle" style="width:60px;">
+                    <img src="{{ tweet.user.profile.image.url }}"  class="mr-3 mt-3 rounded-circle" style="width:60px;">
                     <div class="media-body">
-                        <h5>{{ object.username }}<small> Posted {{ tweet.date_posted|timesince }} ago </small></h5>
+                        {% if tweet.parent %}
+                            <p><span class="text-muted">Retweeted via <a href="/{{ tweet.user.username }}">{{ tweet.user.username }}</a>
+                            at <small> {{ tweet.date_posted }} </small></span></p>
+                            <h5><a href="{{ tweet.parent.user.username }}">{{ tweet.parent.user.username }}</a><small> Posted {{ tweet.parent.date_posted|timesince }} ago </small></h5>
+                        {% else %}
+                            <h5><a href="/{{ tweet.user.username }}">{{ tweet.user.username }}</a><small> Posted {{ tweet.date_posted|timesince }} ago </small></h5>
+                        {% endif %}
                         <p class="media-content">{{ tweet.content }}</p>
+                        <a href="{% url 'tweet-detail' tweet.id %}">View</a> |
+                        {% if tweet.parent %}
+                            <a> Retweeted </a> |
+                        {% else %}
+                            <a class="retweetBtn" href="" data-id="{{ tweet.id }}">Retweet</a> | 
+                        {% endif %}
+                        {% if request.user in tweet.likes.all %}
+                            <a class="tweet-like" href="" data-id="{{ tweet.id }}">Unlike</a> |
+                        {% else %}
+                            <a class='tweet-like' href="" data-id="{{ tweet.id }}">Like</a> | 
+                        {% endif %}
                     </div>
                 </div>
                 {% empty %}
@@ -93,20 +110,7 @@
 
 
 {% endblock content %}
-<!-- {% block style %}
-<script>
-        function updateHashLinks(){
-            $(".media-content").each(function(data){
-                console.log($(this));
-                var hashtagRegex = /(^|\s)#([\w\d-]+)/g
-                var newText = $(this).html().replace(hashtagRegex,"$1<a href='/tags/$2/'>#$2</a>");
-                $(this).html(newText);
-            })
-        }
-        updateHashLinks();
-        console.log("running");
-    </script>
-{% endblock style %} -->
+
 {% block endscript %}
 <script>
     $(document).ready(function(){
@@ -119,6 +123,48 @@
         }
         updateHashLinks();
     })
-    
+    $(document.body).on("click",".tweet-like",function(e){
+    e.preventDefault();
+    console.log(e);
+    var this_ = $(this);
+    var tweetId = this_.attr('data-id');
+    var likeUrl = '/api/' + tweetId + "/like/";
+    $.ajax({
+        method:"GET",
+        url:likeUrl,
+        success:function(data){
+            if(data.liked){
+                this_.text("Unlike")
+            } else {
+                this_.text("Like")
+            }
+        },
+        error:function(data){
+            console.log("error");
+            console.log(data);
+        }
+    })
+    })
+    $(document.body).on("click",".retweetBtn",function(e){
+            e.preventDefault();
+            console.log("Retweeting....");
+            var url = "/api/" + $(this).attr("data-id") + "/retweet/";
+            console.log(url);
+            $.ajax({
+                method:"GET",
+                url:url,
+                success:function(data){
+                    console.log(data);
+                    $(this).text("Retweeted")
+                    //createTweets(data,true,true);
+                    // updateHashLinks()
+                },
+                error:function(data){
+                    console.log("error");
+                    alert(data.responseJSON.message);
+                    console.log(data);
+                }
+            })
+        })
 </script>
 {% endblock endscript %}
