@@ -1,0 +1,11 @@
+{% extends 'tweets/base.html' %}
+{% block content %}
+<div class="row">
+    <div></div>
+    <div>
+        {% for tweet in obj.get_tweets %}
+            <p>{{ tweet.content }}</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}

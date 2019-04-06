@@ -1,0 +1,25 @@
+{% extends 'tweets/base.html' %}
+{% block content %}
+<div class="row ">
+    <div class="col-lg-3"></div>
+    <div class="col-lg-6 border mt-4">
+            <div class="" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+       
+                    <form method="POST">
+                        {% csrf_token %}
+                    <div class="modal-body">
+                      <p>Are you sure you want to delete? "{{ object.content }}"
+                      It will delete this tweet permanently as well as all retweets of this tweet</p>
+                    </div>
+                    <div class="modal-footer">
+                      <a href="{% url 'tweet-detail' object.id %}" class="btn btn-secondary">Cancel</a>
+                      
+                      <button type="submit" class="btn btn-primary">Delete</button>
+                    </div>
+                    </form>
+        </div>
+    </div>
+    <div class="col-lg-3"></div>
+</div>
+
+{% endblock content %}

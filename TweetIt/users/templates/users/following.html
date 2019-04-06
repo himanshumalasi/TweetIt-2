@@ -1,0 +1,136 @@
+{% extends 'tweets/base.html' %}
+{% block content %}
+<style>
+    .container-fluid {
+        padding-left: 0;
+        padding-right: 0;
+    }
+  .cover-image {
+      width: 100%;
+      height: 32vh;
+      background-repeat: no-repeat;
+      background-size: cover;
+  }
+  .cover-image img {
+      width: 100%;
+      height: 32vh;
+  }
+  .user-info {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 70px;
+    background-color: #e4e4e4;
+  }
+  .user-info-actual {
+      width: 500px;
+  }
+  .user-info .user-info-actual ul {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      list-style: none;
+      width: 100%;
+      margin-bottom: 0px;
+      padding-left: 0px;
+  }
+  .edit-profile-button {
+      justify-items: center;
+      background: none;
+      border-radius: 1px 5px 1px 5px;
+      border: none;
+      background-color: #dffafa;
+      padding: 3px;
+  }
+  .user-box {
+      width: 250px;
+      height: 230px;
+      float: left;
+      margin: 5px;
+      border: 1px solid black;
+  }
+  .user-box .user-cover-image {
+    width: 100%;
+    height: 80px;
+  }
+  .user-cover-image img {
+      width: inherit;
+      height: inherit;
+  }
+  .info-container {
+      width: 100%;
+      height: 120px;
+      padding: 5px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+  }
+  .user-profile-image {
+    margin-right: 10px;
+  }
+  .user-profile-image img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+  }
+  .user-details {
+
+  }
+</style>
+<div class="cover-image">
+        <img src="{{ request_user.profile.cover.url }}" alt="">
+</div>
+<div class="user-info">
+        <div class="user-info-actual">
+                <ul>
+                        <li><a href="{% url 'user-following' request_user.username %}">Following({{ request_user.user_profile.following.all.count }})</a></li>
+                        <li><a href="{% url 'user-follower' request_user.username %}">Follower({{ request_user.followed_by.all.count }})</a></li>
+                        <li><a href="">Likes</a></li>
+                </ul>
+        </div>
+        <div class="edit-profile-button-container">
+            <a href="{% url 'profile' %}" class="btn btn-primary">Edit Your Profile</a>
+        </div>
+</div>
+<div class="row">
+        <div class="col-lg-2">
+        </div>
+        <div class="col-lg-8 mt-2">
+                {% for user in following %}
+                <div class="user-box">
+                    <div class="user-cover-image">
+                        <img src="{{ user.profile.cover.url }}">
+                    </div>
+                    <div class="info-container">
+                        <div class="user-profile-image">
+                            <img src="{{ user.profile.image.url }}">
+                        </div>
+                        <div class="user-details">
+                                <p><a href="{% url 'user-detail' user.username %}"> {{ user.username }}</a></p>
+                                <small>{{ user.profile.description }}</small>
+                                <!-- {% if request.user == request_user %}
+                                    <a href="{% url 'user-follow' user.username %}" style="display: block;">Unfollow</a>
+                                {% else %}
+                                {% endif %} -->
+                                {% if user == request.user %}
+
+                                {% elif user not in request.user.user_profile.following.all %}
+                                    <a href="{% url 'user-follow' user.username %}" style="display: block;">Follow</a>
+                                {% else %}
+                                    <a href="{% url 'user-follow' user.username %}" style="display: block;">Unfollow</a>
+                                {% endif %}
+
+                                
+                        </div>
+                    </div>
+                   
+                </div>
+                    
+                {% empty %}
+                <p class="mt-2">You are not following any user</p>
+                {% endfor %}
+        </div>
+        <div class="col-lg-2"></div>
+</div>
+{% endblock content %}

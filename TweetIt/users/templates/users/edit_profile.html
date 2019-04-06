@@ -1,0 +1,17 @@
+
+{% extends 'tweets/base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="row">
+        <div class="col-lg-3"></div>
+        <div class="col-lg-6 mt-3" style="border:1px solid #ccc; padding: 20px;">
+            <h1>Edit Your Profile</h1>
+            <form action="" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button class="btn btn-primary">Edit Profile</button>
+            </form>
+        </div>
+        <div class="col-lg-3"></div>
+    </div>
+{% endblock content %}

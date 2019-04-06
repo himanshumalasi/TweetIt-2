@@ -1,0 +1,88 @@
+{% extends 'tweets/base.html' %}
+{% block content %}
+    <div class="media border p-3 mt-4" style="border:1px solid black;">
+        <img class="mr-3 mt-3 rounded-circle" style="width:60px" src="{{ object.user.profile.image.url }}">
+        <div class="media-body">
+            {% if object.parent %}
+            <p><span class="text-muted">Posted via <a href="/{{ object.parent.user.username }}">{{ object.parent.user}}</a>
+            at <small> {{ object.parent.date_posted }} </small></span></p>
+            {% endif %}
+            <h5><a href="/{{ object.user.username }}">{{ object.user.username }}</a> Posted on {{ object.date_posted }}</h5>
+                <p class="media-content">{{ object.content }}</p>
+                <!-- <a class="retweetBtn" href="/{{ object.id }}/retweet/">Retweet</a> |  -->
+                {% if object.parent %}
+                    <a> Retweeted </a> |
+                {% else %}
+                <a class="retweetBtn" href="" data-id="{{ object.id }}">Retweet</a> | 
+                {% endif %}
+                {% if request.user in object.likes.all %}
+                <a class="tweet-like" href="" data-id="{{ object.id }}">Unlike</a> |
+                {% else %}
+                <a class='tweet-like' href="" data-id="{{ object.id }}">Like</a> | 
+                {% endif %}
+                {% if object.user == request.user %}
+                    <a href="{% url 'tweet-delete' object.id %}">Delete</a>
+                {% endif %}
+            </div>
+      </div>
+          
+          <!-- Modal -->
+          
+{% endblock content %}
+
+{% block endscript %}
+<script>
+    function updateHashLinks(){
+            $(".media-content").each(function(data){
+                var hashtagRegex = /(^|\s)#([\w\d-]+)/g
+                var newText = $(this).html().replace(hashtagRegex,"$1<a href='/tags/$2/'>#$2</a>");
+                $(this).html(newText);
+            })
+    }
+    updateHashLinks();
+
+    $(document.body).on("click",".tweet-like",function(e){
+    e.preventDefault();
+    console.log(e);
+    var this_ = $(this);
+    var tweetId = this_.attr('data-id');
+    var likeUrl = '/api/' + tweetId + "/like/";
+    $.ajax({
+        method:"GET",
+        url:likeUrl,
+        success:function(data){
+            if(data.liked){
+                this_.text("Unlike")
+            } else {
+                this_.text("Like")
+            }
+        },
+        error:function(data){
+            console.log("error");
+            console.log(data);
+        }
+    })
+})
+$(document.body).on("click",".retweetBtn",function(e){
+            e.preventDefault();
+            console.log("Retweeting....");
+            var url = "/api/" + $(this).attr("data-id") + "/retweet/";
+            console.log(url);
+            $.ajax({
+                method:"GET",
+                url:url,
+                success:function(data){
+                    console.log(data);
+                    $(this).text("Retweeted")
+                    //createTweets(data,true,true);
+                    // updateHashLinks()
+                },
+                error:function(data){
+                    console.log("error");
+                    alert(data.responseJSON.message);
+                    console.log(data);
+                }
+            })
+        })
+</script>
+{% endblock endscript %}
