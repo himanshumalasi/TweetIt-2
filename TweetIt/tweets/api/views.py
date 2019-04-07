@@ -31,11 +31,43 @@ class TweetListApiView(generics.ListAPIView):
 
         
     def get_queryset(self,*args,**kwargs):
-        query = self.request.GET.get("q" or None)
         im_following = self.request.user.user_profile.get_following()
         qs1 = Tweet.objects.filter(Q(user__in=im_following))
         qs2 = Tweet.objects.filter(user=self.request.user)
         qs = (qs1 | qs2).distinct().order_by("-date_posted")
+
+        return qs
+
+class TweetSearchApiView(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = TweetModelSerializer
+
+    # def get_serializer(self,*args,**kwargs):
+    #     context = super(TweetListApiView,self).get_serializer(*args,**kwargs)
+    #     #print(context)
+    #     #context['request'] = self.request
+    #     return context
+
+    def get_serializer_context(self,*args,**kwargs):
+        context = super(TweetSearchApiView,self).get_serializer_context(*args,**kwargs)
+        context['request'] = self.request
+        return context 
+
+        
+    def get_queryset(self,*args,**kwargs):
+        query = self.request.GET.get("q")
+        print(query)
+        # im_following = self.request.user.user_profile.get_following()
+        # qs1 = Tweet.objects.filter(Q(user__in=im_following))
+        # qs2 = Tweet.objects.filter(user=self.request.user)
+        # qs = (qs1 | qs2).distinct().order_by("-date_posted")
+        qs = Tweet.objects.all().order_by("-date_posted")
+        if query is not None:
+            qs = qs.filter(
+                Q(content__icontains=query) |
+                Q(user__username__icontains=query)
+            )
+            print(qs)
 
         return qs
 

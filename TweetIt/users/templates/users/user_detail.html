@@ -18,13 +18,15 @@
   .user-info {
     width: 100%;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
     height: 70px;
     background-color: #e4e4e4;
   }
   .user-info-actual {
-      width: 500px;
+      width: 300px;
+      margin-left: 50px;
+      margin-right: 50px;
   }
   .user-info .user-info-actual ul {
       display: flex;
@@ -34,6 +36,9 @@
       width: 100%;
       margin-bottom: 0px;
       padding-left: 0px;
+  }
+  .edit-profile-button-container {
+      margin-right: 50px;
   }
   .edit-profile-button {
       justify-items: center;
@@ -56,7 +61,6 @@
                 <ul>
                         <li><a href="{% url 'user-following' object.username %}">Following({{ object.user_profile.following.all.count }})</a></li>
                         <li><a href="{% url 'user-follower' object.username %}">Follower({{ object.followed_by.all.count }})</a></li>
-                        <li><a href="">Likes</a></li>
                 </ul>
         </div>
         <div class="edit-profile-button-container">
@@ -65,11 +69,11 @@
     </div>
 </div>
 <div class="row">
-        <div class="col-lg-2 col-sm-5">
+        <div class="col-lg-3 col-sm-5">
                 <div class="card mt-2" style="margin-left: 10px;">
                         <img class="card-img-top" src="{{ object.profile.image.url }}" alt="Card image cap">
                         <div class="card-body">
-                          <h5 class="card-title">{{ object.username }}</h5>
+                          <a href="/{{ object.username}}"><h5 class="card-title">{{ object.username }}</h5></a>
                           <p class="card-text">Joined {{ object.date_joined }}</p>
                           <p class="card-text">{{ object.profile.description }}</p>
                         </div>
@@ -105,7 +109,7 @@
                 <p class="mt-2">Cannot find any tweets right now</p>
                 {% endfor %}
         </div>
-        <div class="col-lg-4"></div>
+        <div class="col-lg-3"></div>
 </div>
 
 

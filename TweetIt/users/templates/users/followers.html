@@ -86,7 +86,6 @@
                     <ul>
                             <li><a href="{% url 'user-following' request_user.username %}">Following({{ request_user.user_profile.following.all.count }})</a></li>
                             <li><a href="{% url 'user-follower' request_user.username %}">Follower({{ request_user.followed_by.all.count }})</a></li>
-                            <li><a href="">Likes</a></li>
                     </ul>
             </div>
             <div class="edit-profile-button-container">

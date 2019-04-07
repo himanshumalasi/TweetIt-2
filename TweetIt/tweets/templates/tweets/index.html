@@ -16,6 +16,9 @@
 .card-footer {
     display: none;
 }
+.on-hover {
+    background-color: #dc3545;
+}
 </style>
 <div class="row">
 
@@ -123,13 +126,25 @@
                 success:function(data){
                     console.log(data);
                     if(data.message=="Following"){
-
                         this_.text("Following");
-                        this_.removeClass("btn-primary");
-                        this_.addClass("btn-danger");
+                        this_.mouseenter(function(){
+                            this_.text("Unfollow");
+                            this_.addClass("on-hover");
+                        })
+                        this_.mouseleave(function(){
+                            this_.text("Following");
+                            this_.removeClass("on-hover");
+                        })
                     } else {
+                        this_.mouseenter(function(){
+                            this_.text("Follow");
+                        });
+                        this_.mouseleave(function(){
+                            this_.text("Follow");
+                        })
                         this_.text("Follow")
                         this_.removeClass("btn-danger");
+                        this_.removeClass("on-hover");
                         this_.addClass("btn-primary");
                     }
                 },
@@ -319,15 +334,12 @@
                     console.log(error);
                 }
             })
-        },300000);
+        },30000);
 
         function fetchTweets(){
             $.ajax({
                 url:'api/tweet/',
                 method:"GET",
-                data:{
-                    "q":q
-                },
                 success:function(data){
                     oldTweets = data;
                     if(data == 0){
