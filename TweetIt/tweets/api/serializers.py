@@ -66,4 +66,6 @@ class TweetModelSerializer(serializers.ModelSerializer):
     def get_date_posted(self,obj):
         return obj.date_posted.strftime("%b %d, %Y at %I:%M %p")
 
+
+
     

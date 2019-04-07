@@ -44,6 +44,7 @@ urlpatterns = [
         name='password_reset_complete'
     ),
     path('api/',include('tweets.api.urls')),
+    path('api/',include('users.api.urls')),
     path('tags/<slug:hashtag>/',
         HashTagView.as_view(),
         name='hashtag'),

@@ -10,7 +10,7 @@ from django.urls import path
 
 urlpatterns = [
     # path('tweet/new/',TweetNewApiView.as_view()),
-    path('tweet/',TweetListApiView.as_view()),
+    path('tweet/',TweetListApiView.as_view(),name='tweet-api'),
     path('create/',TweetCreateApiView.as_view()),
     path('<int:pk>/delete/',TweetDeleteApiView.as_view()),
     path('<int:pk>/retweet/',RetweetAPIView.as_view()),

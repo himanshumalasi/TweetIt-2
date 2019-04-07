@@ -3,7 +3,7 @@ from django.views import generic,View
 from django.contrib.auth.models import User
 from .models import Follow
 from .forms import UserRegisterForm, UserProfileForm
-
+from django.contrib import messages
 
 class UserDetailView(generic.DetailView):
     queryset = User.objects.all()
@@ -83,6 +83,7 @@ def register(request):
         form = UserRegisterForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request,"Successfully register.Please login to continue")
             return redirect('login')
     else:
         return render(request,'users/register.html',{'form':form})
@@ -96,6 +97,7 @@ def profile(request):
             profile = form.save(commit=False)
             print(profile)
             profile.user = request.user
+            messages.success(request,"Profile Successfully updated")
             profile.save()
             return render(request,'users/edit_profile.html',{"form":form})
     return render(request,'users/edit_profile.html',{"form":form})

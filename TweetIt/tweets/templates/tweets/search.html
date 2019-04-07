@@ -1,0 +1,38 @@
+{% extends 'tweets/base.html' %}
+{% block content %}
+    <div class="row">
+        <div class="col-lg-3 col-sm-12"></div>
+        <div class="col-lg-6 col-sm-12 mt-4" style="padding:5px;">
+                <div class="form-group">
+                        <input type="text" class="form-control" id="search" placeholder="Search">
+                </div>
+        </div>
+        <div class="col-lg-3 col-sm-12"></div>
+    </div>
+{% endblock content %}
+{% block endscript %}
+<script>
+    $(document).ready(function(){
+        var typingTimer;
+        var doneInterval = 500;
+        var searchQuery;
+        var searchInput = $("#search");
+        searchInput.keyup(function(e){
+            e.preventDefault();
+            searchQuery = $(this).val();
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(doneSearchTying,doneInterval);
+        })
+        searchInput.keydown(function(e){
+            e.preventDefault();
+            clearTimeout(typingTimer);
+        })
+        function doneSearchTying(){
+            if (searchQuery){
+                var url = ''
+            }
+        }
+    })
+
+</script>
+{% endblock endscript %}

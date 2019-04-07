@@ -31,6 +31,7 @@ class TweetListApiView(generics.ListAPIView):
 
         
     def get_queryset(self,*args,**kwargs):
+        query = self.request.GET.get("q" or None)
         im_following = self.request.user.user_profile.get_following()
         qs1 = Tweet.objects.filter(Q(user__in=im_following))
         qs2 = Tweet.objects.filter(user=self.request.user)

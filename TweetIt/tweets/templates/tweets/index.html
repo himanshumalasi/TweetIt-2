@@ -13,11 +13,14 @@
 #no-tweet {
     display: none;
 }
+.card-footer {
+    display: none;
+}
 </style>
 <div class="row">
 
 
-<div class="col-lg-3 col-sm-5">
+<div class="col-lg-3 col-sm-12 mt-10">
         <div class="card mt-2" style="">
                 <img class="card-img-top" src="{{ request.user.profile.image.url }}" alt="Card image cap">
                 <div class="card-body">
@@ -32,7 +35,7 @@
                 </div>
         </div>
 </div>
-<div class="col-lg-7 col-sm-7">
+<div class="col-lg-6 col-sm-12">
     <div class="form-container mt-2 mb-2">
         <form action="" id="form" class="form" method="POST">
             {% csrf_token %}
@@ -40,13 +43,35 @@
             <button class="btn btn-primary">Tweet</button>
         </form>
     </div>
-    <div class="card-footer text-muted text-center"><a href="">2 New Tweets</a></div>
+    <a href="" class="newtweetload"><div class="card-footer text-muted text-center" style="color:blue;"><span id="newtweetnumber"></span > New Tweets</div></a>
     <div id="tweet-container">
         <p id="no-tweet">No tweets found</p>
     </div>
 </div>
-<div class="col-lg-2">
-    <div class="mt-2"></div>
+<div class="col-lg-3 col-sm-12">
+    <div class="mt-2">
+        <h3 class="text-center">Who to follow?</h3>
+            <div>
+                    
+                    <!-- <li class="list-group-item">Dapibus ac facilisis in</li>
+                    <li class="list-group-item">Morbi leo risus</li>
+                    <li class="list-group-item">Porta ac consectetur ac</li>
+                    <li class="list-group-item">Vestibulum at eros</li> -->
+                  
+                {% for user in follow_user %}
+                <div class="media" style="padding:5px;">
+                        <img src="{{ user.profile.image.url }}" class="rounded-circle mr-3" style="width:60px;" alt="...">
+                        <div class="media-body">
+                          <h5 class="mt-0"><a href="/{{ user.username }}">{{user.username}}</a></h5>
+                            <button class="followBtn btn btn-primary" href="" data-id="{{user.id}}">Follow</button>
+                        </div>
+                </div>
+                 <hr> 
+                 {% empty %}
+                 <p>No User to follow</p>  
+                {% endfor %}
+            </div>
+    </div>
 </div>
 
 </div>
@@ -54,11 +79,27 @@
 
 {% block style %}
 <script>
+    function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
     $(document).ready(function(){
         var oldTweets = [];
         var newTweets = [];
+        var newTweetItem = [];
+        var oldTweetsLength;
+        var newTweetsLength;
         var tweets = [];
+
         console.log('Working');
+
+        var q = getParameterByName("q");
+        console.log(q);
 
         function updateHashLinks(){
             $(".media-content").each(function(data){
@@ -67,7 +108,60 @@
                 $(this).html(newText);
             })
         }
-        
+
+        $(".followBtn").click(function(e){
+            e.preventDefault();
+            console.log("clicked");
+            var userID = $(this).attr('data-id');
+            console.log(userID);
+            var followUrl = '/api/' + userID + '/follow/';
+            console.log(followUrl);
+            var this_ = $(this);
+            $.ajax({
+                method:"GET",
+                url:followUrl,
+                success:function(data){
+                    console.log(data);
+                    if(data.message=="Following"){
+
+                        this_.text("Following");
+                        this_.removeClass("btn-primary");
+                        this_.addClass("btn-danger");
+                    } else {
+                        this_.text("Follow")
+                        this_.removeClass("btn-danger");
+                        this_.addClass("btn-primary");
+                    }
+                },
+                error:function(error){
+                    console.log("error");
+                    console.log(error);
+                }
+
+            })
+        })
+
+        $(".newtweetload").click(function(e){
+            e.preventDefault();
+            newTweetItem.reverse();
+            $.each(newTweetItem,function(key,value){
+                oldTweets.push(value);
+                console.log(key,value)
+                if(value.parent){
+                    createTweets(value,true,true);
+                    updateHashLinks();
+                } else {
+                    createTweets(value,true,true);
+                     updateHashLinks();
+                }
+                            
+            })
+            $(".card-footer").css("display","none");
+            newTweetItem = [];
+            // console.log("inside click",oldTweets);
+        })
+
+
         $(document.body).on("click",".tweet-delete",function(e){
             e.preventDefault();
             console.log("Delete Tweet..");
@@ -123,6 +217,7 @@
                 url:url,
                 success:function(data){
                     console.log(data);
+                    oldTweets.push(data);
                     createTweets(data,true,true);
                     updateHashLinks()
                 },
@@ -135,7 +230,6 @@
         })
 
         function createTweets(tweet,prepend,retweet){
-            console.log(tweet);
             var username = tweet.user.username;
             var tweetContent = tweet.content;
             var datePosted = tweet.date_posted;
@@ -187,6 +281,8 @@
                     $("#no-tweet").css("display","none");
                     setTimeout(function(){
                         createTweets(data,true,false);
+                        console.log(data);
+                        oldTweets.push(data);
                         updateHashLinks();
                     },250)
                 },
@@ -198,17 +294,16 @@
         })
 
         function showNewTweets(){
-            console.log("Show New Tweets");
-            var oldTweetsLength = oldTweets.length;
-            var newTweetsLength = newTweets.length;
+            oldTweetsLength = oldTweets.length;
+            newTweetsLength = newTweets.length;
             // Getting only latest tweet
-            var newTweetItem = newTweets.splice(0,newTweetsLength-oldTweetsLength);
-            // oldTweets.forEach((e1)=>newTweets.forEach((e2)=> {if(e1 === e2){
-            //     console.log(e1);
-            //     console.log(e2);
-            //         }
-            //     }
-            // ));
+            console.log(oldTweetsLength,newTweetsLength);
+            newTweetItem = newTweets.splice(0,newTweetsLength-oldTweetsLength);
+            console.log("Newest tweet",newTweetItem);
+            if(newTweetItem.length > 0){
+                $(".card-footer").css("display","block");
+                $("#newtweetnumber").text(newTweetItem.length);
+            }
         }
 
         setInterval(function fetchLatestTweets(){
@@ -216,7 +311,7 @@
                 url:'api/tweet/',
                 method:"GET",
                 success:function(data){
-                    newTweets = data;
+                    newTweets = [...data];
                     showNewTweets();
                 },
                 error:function(error){
@@ -224,14 +319,16 @@
                     console.log(error);
                 }
             })
-        },3000000);
+        },300000);
 
         function fetchTweets(){
             $.ajax({
                 url:'api/tweet/',
                 method:"GET",
+                data:{
+                    "q":q
+                },
                 success:function(data){
-                    console.log(data);
                     oldTweets = data;
                     if(data == 0){
                         $("#no-tweet").css("display","block");
